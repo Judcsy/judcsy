@@ -1,16 +1,77 @@
-## Hi there 👋
+# AI TestGen Pro
 
-<!--
-**Judcsy/judcsy** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+**AI TestGen Pro** 是一个基于大语言模型（LLM）的智能测试用例生成系统。它能够深度集成飞书文档，自动解析包含文字、流程图和UI设计稿的PRD（产品需求文档），并利用火山引擎（Doubao模型）的强大推理能力，生成高质量、覆盖全面的测试用例。此外，系统还提供智能对比评分功能，帮助测试人员评估用例质量。
 
-Here are some ideas to get you started:
+## 🌟 核心功能
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+*   **📚 飞书深度集成**
+    *   一键导入飞书在线文档（支持 docx）。
+    *   自动解析文档结构，提取关键需求信息。
+    *   **多模态支持**：自动下载并识别文档中的图片（流程图、UI稿），将视觉信息转化为文字描述参与生成。
+
+*   **🧠 智能用例生成**
+    *   **双引擎驱动**：
+        *   **Doubao Vision (seed-1.6-vision)**：精准识别图片内容。
+        *   **Doubao Thinking (seed-1.6-thinking)**：深度理解业务逻辑，生成结构化测试用例。
+    *   **场景全覆盖**：自动生成前端交互、后端接口、异常场景（占比≥20%）和边界值场景（占比≥15%）。
+
+*   **⚖️ 智能对比评分**
+    *   支持导入人工标准用例与AI生成用例进行对比。
+    *   **混合匹配算法**：结合关键词匹配与语义理解，精准定位对应关系。
+    *   **多维度打分**：从语义一致性、步骤逻辑、预期结果、数据准确性四个维度进行加权评分。
+
+## 🛠️ 技术栈
+
+*   **后端**: Java 17, Spring Boot (嵌入式简易服务器)
+*   **前端**: Vue.js, Element UI
+*   **AI 模型**: Volcano Engine (Doubao-Seed-1.6 系列)
+*   **集成**: Feishu Open Platform API
+
+## 🚀 快速开始
+
+### 前置要求
+
+*   JDK 17+
+*   Maven 3.6+
+*   飞书开放平台应用凭证 (App ID, App Secret)
+*   火山引擎方舟平台凭证 (Endpoint ID, API Key)
+
+### 配置
+
+您可以通过环境变量配置以下参数：
+
+| 变量名 | 描述 |
+| :--- | :--- |
+| `FEISHU_APP_ID` | 飞书应用 ID |
+| `FEISHU_APP_SECRET` | 飞书应用 Secret |
+| `VOLCANO_ENDPOINT_ID` | 火山引擎接入点 ID (Thinking) |
+| `VOLCANO_VISION_ENDPOINT_ID` | 火山引擎视觉模型接入点 ID |
+| `ARK_API_KEY` | 火山引擎 API Key |
+
+### 运行项目
+
+1.  **克隆项目**
+    ```bash
+    git clone https://github.com/Judcsy/judcsy.git
+    cd judcsy
+    ```
+
+2.  **编译并运行**
+    ```bash
+    mvn compile exec:java
+    ```
+
+3.  **访问应用**
+    打开浏览器访问: `http://localhost:8080`
+
+## 📖 使用指南
+
+1.  **导入文档**: 在首页输入飞书文档链接（需确保飞书应用有文档阅读权限）。
+2.  **配置凭证**: 如果未配置环境变量，可在前端界面点击"飞书应用配置"手动输入 App ID 和 Secret。
+3.  **生成用例**: 文档解析完成后（含图片识别），点击"智能生成测试用例"。
+4.  **查看结果**: 系统将展示生成的用例列表，支持导出 JSON。
+5.  **对比评估**: 切换到"对比评分"标签页，输入人工标准用例，系统将自动进行对比打分。
+
+## 📄 许可证
+
+MIT License

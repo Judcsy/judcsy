@@ -1,0 +1,50 @@
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# VS Code
+.vscode/
+
+# 输出文件
+*.json
+!pom.json
+!schema/*.json
+*.md
+!README.md
+*.args
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 临时文件
+*.tmp
+*.log
+*.bak
+
+# 编译输出
+dist/
+lib/
+
+# 敏感信息/环境配置
+.env
+.env.*
+*.env
+config.local.*
+secrets.*
+**/credentials*
+**/secret*

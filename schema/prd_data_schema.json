@@ -1,0 +1,177 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PRD解析结果数据结构",
+  "description": "PRD解析器输出的结构化数据格式定义",
+  "type": "object",
+  "properties": {
+    "frontendModules": {
+      "type": "array",
+      "description": "前端模块列表",
+      "items": {
+        "type": "object",
+        "properties": {
+          "moduleName": {
+            "type": "string",
+            "description": "模块名称"
+          },
+          "pageElements": {
+            "type": "array",
+            "description": "页面元素列表",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["button", "input", "select", "checkbox", "radio", "textarea"],
+                  "description": "元素类型"
+                },
+                "id": {
+                  "type": "string",
+                  "description": "元素ID"
+                },
+                "label": {
+                  "type": "string",
+                  "description": "元素标签"
+                }
+              },
+              "required": ["type", "id", "label"]
+            }
+          },
+          "interactionFlow": {
+            "type": "array",
+            "description": "交互流程步骤",
+            "items": {
+              "type": "string"
+            }
+          },
+          "visualFeedback": {
+            "type": "array",
+            "description": "视觉反馈规则",
+            "items": {
+              "type": "string"
+            }
+          },
+          "validationRules": {
+            "type": "array",
+            "description": "前端校验规则",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["moduleName"]
+      }
+    },
+    "backendModules": {
+      "type": "array",
+      "description": "后端模块列表",
+      "items": {
+        "type": "object",
+        "properties": {
+          "moduleName": {
+            "type": "string",
+            "description": "模块名称"
+          },
+          "interfaces": {
+            "type": "array",
+            "description": "接口列表",
+            "items": {
+              "type": "object",
+              "properties": {
+                "method": {
+                  "type": "string",
+                  "enum": ["GET", "POST", "PUT", "DELETE", "PATCH"],
+                  "description": "HTTP方法"
+                },
+                "path": {
+                  "type": "string",
+                  "description": "接口路径",
+                  "pattern": "^/"
+                },
+                "params": {
+                  "type": "object",
+                  "description": "请求参数，键为参数名，值为参数类型",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "response": {
+                  "type": "object",
+                  "description": "响应结构",
+                  "additionalProperties": true
+                },
+                "validationRules": {
+                  "type": "array",
+                  "description": "接口校验规则",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": ["method", "path"]
+            }
+          },
+          "businessRules": {
+            "type": "array",
+            "description": "业务规则",
+            "items": {
+              "type": "string"
+            }
+          },
+          "exceptionScenarios": {
+            "type": "array",
+            "description": "异常场景",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["moduleName"]
+      }
+    },
+    "crossModuleLogics": {
+      "type": "array",
+      "description": "前后端协同逻辑列表",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "协同逻辑名称"
+          },
+          "frontendModule": {
+            "type": "string",
+            "description": "前端模块名称"
+          },
+          "backendModule": {
+            "type": "string",
+            "description": "后端模块名称"
+          },
+          "dataFlow": {
+            "type": "array",
+            "description": "数据流转链路",
+            "items": {
+              "type": "string"
+            }
+          },
+          "stateSync": {
+            "type": "array",
+            "description": "状态同步机制",
+            "items": {
+              "type": "string"
+            }
+          },
+          "errorHandling": {
+            "type": "array",
+            "description": "异常处理流程",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["name", "frontendModule", "backendModule"]
+      }
+    }
+  },
+  "required": ["frontendModules", "backendModules", "crossModuleLogics"]
+}

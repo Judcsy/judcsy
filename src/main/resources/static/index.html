@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 智能测试用例生成系统</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-plus@2.4.4/dist/index.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #0f172a;
+        }
+
+        /* 加载指示器样式 */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f172a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: #38bdf8;
+        }
+
+        #loading-screen.hidden {
+            display: none;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #1e293b;
+            border-top-color: #38bdf8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        .loading-error {
+            color: #f87171;
+            margin-top: 10px;
+            font-size: 12px;
+            max-width: 400px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 加载指示器 (在Vue外部，保证一定能显示) -->
+    <div id="loading-screen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">正在加载应用...</div>
+        <div id="loading-error" class="loading-error"></div>
+        <noscript>
+            <div style="color: #f87171; margin-top: 20px;">请启用 JavaScript 才能使用此应用</div>
+        </noscript>
+    </div>
+
+    <div id="app" v-cloak>
+        <el-container class="layout-container" style="min-height: 100vh;">
+            <!-- 顶部导航 -->
+            <el-header class="app-header">
+                <div class="logo">
+                    <el-icon :size="24" color="#38bdf8">
+                        <Platform />
+                    </el-icon>
+                    <span class="title">AI TestGen Pro</span>
+                </div>
+                <div class="actions">
+                    <el-tag type="success" effect="dark" round>v2.2</el-tag>
+                </div>
+            </el-header>
+
+            <el-container style="flex-direction: column;">
+                <!-- 上部：PRD 输入区 -->
+                <div class="split-top" style="padding: 24px; box-sizing: border-box;">
+                    <prd-input @generate="handleGenerate" @compare="handleCompare" :loading="loading"
+                        :ai-cases="testCases"></prd-input>
+                </div>
+
+                <!-- 下部：结果展示区 -->
+                <div class="split-bottom" style="padding: 0 24px 24px 24px; box-sizing: border-box; flex: 1;">
+                    <el-main class="app-main" style="padding: 0; overflow: visible;">
+                        <el-tabs v-model="activeTab" type="border-card" class="main-tabs">
+                            <el-tab-pane name="cases">
+                                <template #label>
+                                    <span><el-icon>
+                                            <Document />
+                                        </el-icon> AI生成用例</span>
+                                </template>
+                                <test-case-display :cases="testCases" :loading="loading"></test-case-display>
+                            </el-tab-pane>
+                            <el-tab-pane name="comparison">
+                                <template #label>
+                                    <span><el-icon>
+                                            <Connection />
+                                        </el-icon> 对比视图</span>
+                                </template>
+                                <case-comparison :ai-cases="testCases" :reference-cases="referenceCases"
+                                    :loading="loading" :comparison-result="comparisonResult" :prd-text="currentPrdText"></case-comparison>
+                            </el-tab-pane>
+                            <el-tab-pane name="evaluation">
+                                <template #label>
+                                    <span><el-icon>
+                                            <PieChart />
+                                        </el-icon> 质量评测</span>
+                                </template>
+                                <evaluation-result :result="evaluationResult" :loading="evaluating"></evaluation-result>
+                            </el-tab-pane>
+                            <el-tab-pane label="思维导图" name="mindmap">
+                                <div id="mindmap-container"></div>
+                            </el-tab-pane>
+                        </el-tabs>
+                    </el-main>
+                </div>
+            </el-container>
+        </el-container>
+    </div>
+
+    <!-- 引入库文件 -->
+    <script>
+        // 全局错误处理
+        var loadErrors = [];
+        window.onerror = function (msg, url, line, col, error) {
+            console.error('Global error:', msg, url, line);
+            loadErrors.push(msg);
+            var errorDiv = document.getElementById('loading-error');
+            if (errorDiv) {
+                errorDiv.innerHTML = '加载错误: ' + loadErrors.join('<br>') + '<br><a href="javascript:location.reload()" style="color:#38bdf8;">点击刷新重试</a>';
+            }
+            return false;
+        };
+
+        // 超时检测
+        setTimeout(function () {
+            if (typeof Vue === 'undefined') {
+                var errorDiv = document.getElementById('loading-error');
+                if (errorDiv) {
+                    errorDiv.innerHTML = 'CDN 资源加载超时，请检查网络连接<br><a href="javascript:location.reload()" style="color:#38bdf8;">点击刷新重试</a>';
+                }
+            }
+        }, 10000);
+    </script>
+    <script src="https://unpkg.com/vue@3.3.11/dist/vue.global.prod.js"></script>
+    <script src="https://unpkg.com/element-plus@2.4.4/dist/index.full.js"></script>
+    <script src="https://unpkg.com/axios@1.6.2/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/echarts@5.4.3/dist/echarts.min.js"></script>
+    <!-- Element Plus 图标 -->
+    <script src="https://unpkg.com/@element-plus/icons-vue@2.3.1/dist/index.iife.min.js"></script>
+
+    <!-- 应用逻辑 -->
+    <script src="js/api.js"></script>
+    <script src="js/components/PrdInput.js"></script>
+    <script src="js/components/TestCaseDisplay.js"></script>
+    <script src="js/components/CaseComparison.js"></script>
+    <script src="js/components/EvaluationResult.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,173 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "测试用例数据结构",
+  "description": "测试用例生成器输出的测试用例格式定义",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "caseId": {
+        "type": "string",
+        "description": "测试用例唯一ID",
+        "pattern": "^TC_\\d{4}$"
+      },
+      "module": {
+        "type": "string",
+        "description": "所属模块名称"
+      },
+      "sceneType": {
+        "type": "string",
+        "enum": ["FRONTEND", "BACKEND", "INTEGRATION", "EXCEPTION"],
+        "description": "测试场景类型"
+      },
+      "title": {
+        "type": "string",
+        "description": "测试用例标题"
+      },
+      "preCondition": {
+        "type": "array",
+        "description": "前置条件列表",
+        "items": {
+          "type": "string"
+        }
+      },
+      "frontEndSteps": {
+        "type": "array",
+        "description": "前端操作步骤列表",
+        "items": {
+          "type": "object",
+          "properties": {
+            "stepNumber": {
+              "type": "integer",
+              "description": "步骤编号",
+              "minimum": 1
+            },
+            "action": {
+              "type": "string",
+              "description": "操作类型",
+              "enum": ["click", "input", "select", "submit", "trigger", "scroll", "wait"]
+            },
+            "element": {
+              "type": "string",
+              "description": "目标元素描述"
+            },
+            "value": {
+              "type": "string",
+              "description": "输入值（可选）"
+            },
+            "locator": {
+              "type": "object",
+              "description": "元素定位符",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["id", "xpath", "css", "name", "class"],
+                  "description": "定位方式"
+                },
+                "value": {
+                  "type": "string",
+                  "description": "定位值"
+                }
+              },
+              "required": ["type", "value"]
+            }
+          },
+          "required": ["stepNumber", "action", "element"]
+        }
+      },
+      "backEndSteps": {
+        "type": "array",
+        "description": "后端操作步骤列表",
+        "items": {
+          "type": "object",
+          "properties": {
+            "stepNumber": {
+              "type": "integer",
+              "description": "步骤编号",
+              "minimum": 1
+            },
+            "action": {
+              "type": "string",
+              "description": "操作类型",
+              "enum": ["api_call", "db_query", "verify_business_rule", "receive_request", "process_data", "send_response"]
+            },
+            "apiPath": {
+              "type": "string",
+              "description": "API路径"
+            },
+            "method": {
+              "type": "string",
+              "enum": ["GET", "POST", "PUT", "DELETE", "PATCH"],
+              "description": "HTTP方法"
+            },
+            "params": {
+              "type": "object",
+              "description": "请求参数",
+              "additionalProperties": true
+            },
+            "expectedCode": {
+              "type": "integer",
+              "description": "期望的HTTP状态码",
+              "minimum": 100,
+              "maximum": 599
+            }
+          },
+          "required": ["stepNumber", "action"]
+        }
+      },
+      "frontEndExpected": {
+        "type": "array",
+        "description": "前端预期结果列表",
+        "items": {
+          "type": "string"
+        }
+      },
+      "backEndExpected": {
+        "type": "array",
+        "description": "后端预期结果列表",
+        "items": {
+          "type": "string"
+        }
+      },
+      "assertRules": {
+        "type": "array",
+        "description": "断言规则列表",
+        "items": {
+          "type": "object",
+          "properties": {
+            "assertType": {
+              "type": "string",
+              "description": "断言类型",
+              "enum": ["equals", "contains", "exists", "visible", "status_code", "schema", "data_consistency", "state_sync", "business_rule"]
+            },
+            "target": {
+              "type": "string",
+              "description": "断言目标"
+            },
+            "expectedValue": {
+              "description": "期望值，类型可变"
+            },
+            "description": {
+              "type": "string",
+              "description": "断言描述"
+            }
+          },
+          "required": ["assertType", "target", "expectedValue", "description"]
+        }
+      },
+      "priority": {
+        "type": "string",
+        "enum": ["P0", "P1", "P2", "P3"],
+        "description": "优先级"
+      },
+      "tags": {
+        "type": "array",
+        "description": "标签列表",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": ["caseId", "module", "sceneType", "title", "preCondition", "frontEndSteps", "backEndSteps", "frontEndExpected", "backEndExpected", "assertRules", "priority", "tags"]
+  }
+}
